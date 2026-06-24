@@ -27,7 +27,7 @@ and safe handling of malformed or unknown payload blocks.
 
 ### App Recording
 
-[View app recording](./assets/screenshots/app-recording.mp4)
+[View app recording](https://drive.google.com/file/d/1VBR89F79PbS8ehBeW1LFN3q6sSzlIWUD/view?usp=sharing)
 
 ### Home Screen
 
