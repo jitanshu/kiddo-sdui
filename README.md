@@ -1,205 +1,251 @@
-Kiddo SDUI Assignment
+# Kiddo SDUI Assignment
 
-A production-oriented Server Driven UI (SDUI) homepage renderer built with React Native and TypeScript.
+An Expo-powered React Native assignment that demonstrates a Server-Driven UI
+(SDUI) homepage renderer for the Kiddo mobile app.
 
-The application dynamically renders homepage sections from a backend-driven JSON payload while supporting runtime theming, campaign overlays, action dispatching, and rendering optimizations.
+The app consumes a dynamic JSON payload and renders heterogeneous homepage
+blocks through a scalable component registry. The implementation focuses on
+runtime theming, campaign switching, action dispatching, rendering isolation,
+and safe handling of malformed or unknown payload blocks.
 
-⸻
+## Table of Contents
 
-Screenshots
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Supported Blocks](#supported-blocks)
+- [Actions](#actions)
+- [Campaigns](#campaigns)
+- [Project Structure](#project-structure)
+- [Performance Notes](#performance-notes)
+- [Assumptions](#assumptions)
+- [Future Improvements](#future-improvements)
+- [Author](#author)
 
-Back To School Campaign
+## Screenshots
 
-Campaign Switching
+### Home Screen
 
-Cart State Updates
+![Home Screen](./assets/screenshots/home.png)
 
-Render Verification
+### Campaign Switching
 
-⸻
+![Campaign Switching](./assets/screenshots/campaign.png)
 
-Features
+### Cart Update
 
-Dynamic Homepage Rendering
+![Cart Update](./assets/screenshots/cart-update.png)
 
-The homepage is rendered entirely from a JSON payload using a Component Registry architecture.
+### Logs
 
-Supported block types:
+![Logs](./assets/screenshots/logs.png)
 
-* BANNER_HERO
-* PRODUCT_GRID_2X2
-* DYNAMIC_COLLECTION
-* FULL_SCREEN_OVERLAY
+## Tech Stack
 
-Unknown block types are safely ignored to prevent application crashes.
+- **Expo SDK 56** with React Native `0.85.3`
+- **React 19**
+- **TypeScript** in strict mode
+- **FlashList** for performant list virtualization
+- **Zustand** for isolated cart state
+- **React Context API** for runtime theme injection
+- **Lottie React Native** for campaign overlays
 
-⸻
+## Quick Start
 
-Component Registry Pattern
+Install dependencies:
 
-A registry-driven architecture is used for mapping backend component types to React Native components.
+```bash
+npm install
+```
 
-Benefits:
+Start the Expo development server:
 
-* Extensible
-* Scalable
-* Easy to maintain
-* Runtime configurable
+```bash
+npm start
+```
 
-⸻
+Run on Android:
 
-Universal Action Dispatcher
+```bash
+npm run android
+```
 
-All user interactions are routed through a centralized dispatcher.
+Run on iOS:
 
-Supported actions:
+```bash
+npm run ios
+```
 
-* ADD_TO_CART
-* DEEP_LINK
-* APPLY_MYSTERY_GIFT_COUPON
+Run on web:
 
-UI components remain completely decoupled from business logic.
+```bash
+npm run web
+```
 
-⸻
+## Architecture
 
-Campaign Engine
+### Server-Driven UI Flow
 
-Implemented campaign configurations:
+The homepage is fully driven by a local mock backend payload.
 
-Back To School
+```text
+Backend Payload
+  -> SDUI Renderer
+  -> Component Registry
+  -> React Native Components
+```
 
-* Theme Injection
-* School Animation Overlay
-* Lunchboxes & Bags Collection
+### Component Registry Pattern
 
-Summer Playhouse
+The renderer maps payload block types to React Native components through a
+registry instead of relying on large switch statements.
 
-* Theme Injection
-* Summer Product Collection
+```ts
+export const componentRegistry = {
+  BANNER_HERO: BannerHero,
+  PRODUCT_GRID_2X2: ProductGrid2x2,
+  DYNAMIC_COLLECTION: DynamicCollection,
+  FULL_SCREEN_OVERLAY: FullScreenOverlay,
+};
+```
 
-Mystery Gift Carnival
+This keeps the SDUI layer:
 
-* Theme Injection
-* Confetti Overlay
-* Mystery Gift Actions
+- Easy to extend with new block types
+- Simple to maintain as the payload grows
+- Open to runtime component mapping
+- Resilient when unknown block types arrive
 
-Campaigns can be switched at runtime without requiring application updates.
+### Runtime Theme Injection
 
-⸻
+Themes are supplied by the payload and injected into the app with React Context.
 
-Runtime Theme Injection
-
-Themes are supplied through the payload and injected into the application through React Context.
-
-Example:
-
+```json
 {
   "theme": {
     "primary": "#FF9933",
-    "background": "#FFF5E6"
+    "background": "#FFF5E6",
+    "text": "#1F2937",
+    "card": "#FFFFFF"
   }
 }
+```
 
-This allows the UI to adapt instantly to campaign-specific branding.
+This allows campaign-level visual changes without requiring a new app release.
 
-⸻
+### Overlay Architecture
 
-Overlay Architecture
+Overlay blocks are extracted from the main feed and rendered above the
+application layer.
 
-Overlay components are rendered outside the primary FlashList and mounted as a dedicated screen-level layer.
-
-Benefits:
-
-* Full screen campaign effects
-* No scroll interruption
-* No interaction blocking
-
+```tsx
 pointerEvents="none"
+```
 
-ensures all underlying UI remains interactive.
+This allows full-screen campaign effects to appear without interfering with
+scrolling or blocking user interactions.
 
-⸻
+## Supported Blocks
 
-State Management
+The current SDUI renderer supports:
 
-Zustand is used for cart state management.
+- `BANNER_HERO`
+- `PRODUCT_GRID_2X2`
+- `DYNAMIC_COLLECTION`
+- `FULL_SCREEN_OVERLAY`
 
-Cart updates are isolated from the homepage rendering pipeline, preventing unnecessary re-renders of:
+Unknown component types are safely ignored so the rest of the homepage can
+continue rendering.
 
-* Banner blocks
-* Product grids
-* Dynamic collections
+## Actions
 
-⸻
+All user interactions are routed through a centralized action dispatcher.
 
-Performance Optimizations
+Supported actions:
 
-* FlashList virtualization
-* React.memo boundaries
-* Stable keyExtractors
-* useMemo
-* useCallback
-* Overlay separation from feed rendering
-* Zustand selector subscriptions
-* Render isolation verification
+- `ADD_TO_CART`
+- `DEEP_LINK`
+- `APPLY_MYSTERY_GIFT_COUPON`
 
-⸻
+The UI components stay presentation-focused. They dispatch actions, while
+business behavior stays inside the dispatcher.
 
-Payload Validation
+## Campaigns
 
-Runtime type guards validate incoming payloads before rendering.
+The project includes three mock campaign configurations:
 
-Invalid or malformed blocks are filtered out before reaching the rendering layer, ensuring application stability.
+1. **Back To School**
+2. **Summer Playhouse**
+3. **Mystery Gift Carnival**
 
-⸻
+Campaign switching dynamically updates:
 
-Tech Stack
+- Theme colors
+- Homepage content
+- Overlay configuration
+- Campaign-specific actions
 
-* React Native
-* Expo (Prebuild / Bare Workflow)
-* TypeScript (Strict Mode)
-* FlashList
-* Zustand
-* React Context API
-* Lottie React Native
+## State Management
 
-⸻
+Zustand manages cart state independently from the homepage feed rendering
+pipeline.
 
-Project Structure
+This prevents unnecessary re-renders of:
 
-src
-├── actions
-├── components
-├── data
-├── engine
-├── store
-├── theme
-└── types
+- Banner blocks
+- Product grids
+- Dynamic collections
+- Overlay components
 
-⸻
+## Payload Validation
 
-Assumptions
+Runtime type guards validate payload blocks before they are rendered.
 
-* Backend payloads are mocked locally.
-* Campaign assets are represented using local Lottie files.
-* Deep link actions are logged for demonstration purposes.
-* Remote configuration can replace local payloads without architectural changes.
+Invalid or malformed blocks are discarded safely, preserving the remaining view
+hierarchy and keeping the app stable.
 
-⸻
+## Project Structure
 
-Future Improvements
+```text
+src/
+├── actions/        # Central action dispatcher
+├── components/     # SDUI block components and shared UI
+├── data/           # Mock homepage payloads
+├── engine/         # Renderer, registry, and block guards
+├── store/          # Zustand stores
+├── theme/          # Runtime theme context
+└── types/          # SDUI payload and action types
+```
 
-* Remote payload fetching
-* Action Registry pattern
-* Media caching layer
-* Analytics integration
-* Remote campaign management
-* A/B testing integration
+## Performance Notes
 
-⸻
+The implementation uses:
 
-Author
+- FlashList virtualization
+- `React.memo` boundaries
+- Stable key extractors
+- `useMemo` for derived render data
+- `useCallback` for stable handlers
+- Overlay separation from feed rendering
+- Zustand selector-based subscriptions
 
-Jitanshu Kushwaha
+## Assumptions
 
+- Backend payloads are mocked locally.
+- Remote media URLs are mocked with placeholder URLs.
+- Deep link actions are logged for demonstration purposes.
+- Campaign animation assets are represented with local Lottie files.
+
+## Future Improvements
+
+- Fetch payloads from a remote backend
+- Add an action registry pattern
+- Introduce a cached media layer
+- Add analytics instrumentation
+- Support dynamic component registration from remote modules
+
+## Author
+
+**Jitanshu Kushwaha**  
 Senior React Native Developer
