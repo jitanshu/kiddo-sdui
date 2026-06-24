@@ -25,6 +25,10 @@ and safe handling of malformed or unknown payload blocks.
 
 ## Screenshots
 
+### App Recording
+
+[View app recording](./assets/screenshots/app-recording.mp4)
+
 ### Home Screen
 
 ![Home Screen](./assets/screenshots/home.png)
@@ -135,6 +139,15 @@ Themes are supplied by the payload and injected into the app with React Context.
 This allows campaign-level visual changes without requiring a new app release.
 
 ### Overlay Architecture
+
+For demonstration purposes, local Lottie assets are used to simulate remotely delivered campaign media.
+
+In production, the same overlay architecture supports remote URLs supplied by the backend payload:
+
+{
+  "type": "FULL_SCREEN_OVERLAY",
+  "animation_url": "https://assets.example.com/confetti_carnival.json"
+}
 
 Overlay blocks are extracted from the main feed and rendered above the
 application layer.

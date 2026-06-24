@@ -1,5 +1,25 @@
 import { SDUIPayload } from '../types/sdui';
 
+const generateProducts = (count: number) =>
+  Array.from({ length: count }, (_, index) => ({
+    id: `p-${index}`,
+    title: `Product ${index}`,
+    price: `₹${index * 10}`,
+    image: `https://picsum.photos/300/300?${index}`,
+    action: {
+      type: 'ADD_TO_CART',
+      payload: { id: `p-${index}` },
+    },
+  }));
+
+const generateCollections = (count: number) =>
+  Array.from({ length: count }, (_, index) => ({
+    id: `collection-${index}`,
+    type: 'DYNAMIC_COLLECTION' as const,
+    title: `Collection ${index + 1}`,
+    items: generateProducts(10),
+  }));
+
 export const backToSchoolPayload: SDUIPayload = {
   campaignId: 'back_to_school',
   theme: {
@@ -33,17 +53,8 @@ export const backToSchoolPayload: SDUIPayload = {
             { id: 'p4', title: 'Pencil Kit', price: '₹149', image: 'https://picsum.photos/300/300?4', action: { type: 'ADD_TO_CART', payload: { id: 'p4' } } },
         ],
     },
-    {
-        id: 'collection-1',
-        type: 'DYNAMIC_COLLECTION',
-        title: 'Lunchboxes & Bags',
-        items: [
-            { id: 'p5', title: 'Kids Backpack', price: '₹999', image: 'https://picsum.photos/300/300?5', action: { type: 'ADD_TO_CART', payload: { id: 'p5' } } },
-            { id: 'p6', title: 'Insulated Lunchbox', price: '₹399', image: 'https://picsum.photos/300/300?6', action: { type: 'ADD_TO_CART', payload: { id: 'p6' } } },
-            { id: 'p7', title: 'Snack Box', price: '₹199', image: 'https://picsum.photos/300/300?7', action: { type: 'ADD_TO_CART', payload: { id: 'p7' } } },
-        ],
-        },
-        { id: 'unknown-1', type: 'NEW_COMPONENT_V2' } as any,
+    ...generateCollections(5),
+    { id: 'unknown-1', type: 'NEW_COMPONENT_V2' } as any,
   ],
 };
 
